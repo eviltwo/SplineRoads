@@ -13,8 +13,7 @@ namespace SplineRoads
 
         public void Validate(SplineContainer container)
         {
-            var splineCount = container.Spline.Count;
-            if (container == null || splineCount == 0)
+            if (container == null || container.Spline.Count == 0)
             {
                 Index = 0;
             }
