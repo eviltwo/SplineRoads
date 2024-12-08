@@ -123,6 +123,7 @@ namespace SplineRoads
 
             if (Container == null
                 || Container.Splines.Count == 0
+                || Span.Index < 0 || Span.Index >= Container.Splines.Count
                 || ItemsToInstantiate.Count == 0)
             {
                 return;
@@ -283,7 +284,9 @@ namespace SplineRoads
 
         private void OnDrawGizmosSelected()
         {
-            if (Container == null || Container.Splines.Count == 0)
+            if (Container == null
+                || Container.Splines.Count == 0
+                || Span.Index < 0 || Span.Index >= Container.Splines.Count)
             {
                 return;
             }

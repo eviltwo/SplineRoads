@@ -13,14 +13,6 @@ namespace SplineRoads
 
         public void Validate(SplineContainer container)
         {
-            if (container == null || container.Spline.Count == 0)
-            {
-                Index = 0;
-            }
-            else
-            {
-                Index = Mathf.Clamp(Index, 0, container.Spline.Count - 1);
-            }
             Range.x = Mathf.Clamp01(Range.x);
             Range.y = Mathf.Clamp01(Range.y);
         }
