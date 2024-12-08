@@ -62,9 +62,6 @@ namespace SplineRoads
         [SerializeField]
         public Vector3Range ScaleOffset = default;
 
-        [SerializeField]
-        public bool EnableLockAxis = false;
-
         [SerializeField, Range(0, 1)]
         public float FitSlope = 1f;
 

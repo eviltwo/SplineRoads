@@ -266,7 +266,6 @@ MonoBehaviour:
   ScaleOffset:
     Min: {x: 0, y: 0, z: 0}
     Max: {x: 0, y: 0, z: 0}
-  EnableLockAxis: 0
   FitSlope: 1
   CountLimit: 1000
   RandomSeed: -15880
@@ -317,7 +316,6 @@ MonoBehaviour:
   ScaleOffset:
     Min: {x: 0, y: 0, z: 0}
     Max: {x: 0, y: 0, z: 0}
-  EnableLockAxis: 0
   FitSlope: 1
   CountLimit: 1000
   RandomSeed: -15880
