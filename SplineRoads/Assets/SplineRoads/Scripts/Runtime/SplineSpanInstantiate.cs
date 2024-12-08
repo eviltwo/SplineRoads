@@ -151,11 +151,14 @@ namespace SplineRoads
                             continue;
                         }
                         var item = ItemsToInstantiate[randomBox.Choose()];
-                        var instance = CreateInstance(item.Prefab);
-                        CalculateTRS(nativeSpline, t, out var position, out var rotation, out var scale);
-                        instance.transform.position = position;
-                        instance.transform.rotation = rotation;
-                        instance.transform.localScale = scale;
+                        if (item.Prefab != null)
+                        {
+                            var instance = CreateInstance(item.Prefab);
+                            CalculateTRS(nativeSpline, t, out var position, out var rotation, out var scale);
+                            instance.transform.position = position;
+                            instance.transform.rotation = rotation;
+                            instance.transform.localScale = scale;
+                        }
                         var spacing = 0f;
                         switch (InstantiateMethod)
                         {
@@ -206,11 +209,13 @@ namespace SplineRoads
         }
 
         private GameObject _instanceRoot;
-        private readonly List<GameObject> _instances = new List<GameObject>();
+        public GameObject InstanceRoot => _instanceRoot;
+
+        private static readonly List<SplineSpanInstantiate> _componentBuffer = new List<SplineSpanInstantiate>();
+        private static readonly List<GameObject> _unusedObjectBuffer = new List<GameObject>();
 
         private void ClearInstances()
         {
-            _instances.Clear();
             if (Application.isPlaying)
             {
                 Destroy(_instanceRoot);
@@ -220,6 +225,44 @@ namespace SplineRoads
                 DestroyImmediate(_instanceRoot);
             }
             _instanceRoot = null;
+
+            // Destroy unused root objects.
+            _componentBuffer.Clear();
+            GetComponents(_componentBuffer);
+            _unusedObjectBuffer.Clear();
+            var childCount = transform.childCount;
+            for (int i = 0; i < childCount; i++)
+            {
+                var child = transform.GetChild(i);
+                if ((child.gameObject.hideFlags & HideFlags.DontSaveInEditor) == 0)
+                {
+                    continue;
+                }
+                var used = false;
+                foreach (var component in _componentBuffer)
+                {
+                    if (component.InstanceRoot == child.gameObject)
+                    {
+                        used = true;
+                        break;
+                    }
+                }
+                if (!used)
+                {
+                    _unusedObjectBuffer.Add(child.gameObject);
+                }
+            }
+            foreach (var destroyObject in _unusedObjectBuffer)
+            {
+                if (Application.isPlaying)
+                {
+                    Destroy(destroyObject);
+                }
+                else
+                {
+                    DestroyImmediate(destroyObject);
+                }
+            }
         }
 
         private GameObject CreateInstance(GameObject prefab)
@@ -228,13 +271,13 @@ namespace SplineRoads
             {
                 _instanceRoot = new GameObject("SplineSpanInstanceRoot");
                 _instanceRoot.hideFlags |= HideFlags.HideAndDontSave;
+                //InstanceRoot.hideFlags |= HideFlags.NotEditable | HideFlags.DontSave;
                 _instanceRoot.transform.SetParent(transform, false);
             }
             var instance = Instantiate(prefab, _instanceRoot.transform);
 
             instance.hideFlags |= HideFlags.DontSave;
             instance.transform.SetParent(_instanceRoot.transform, false);
-            _instances.Add(instance);
             return instance;
         }
 
