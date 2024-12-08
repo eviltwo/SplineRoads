@@ -199,10 +199,18 @@ namespace SplineRoads
             // Rotation
             var remapRotation = Quaternion.Inverse(Quaternion.LookRotation(ForwardAxis, UpAxis));
             var rotOffset = Vector3.Lerp(RotationOffset.Min, RotationOffset.Max, Random.value);
-            var lockAngleY = Vector3.SignedAngle(transform.forward, tan, transform.up);
-            var lockYRot = Quaternion.AngleAxis(lockAngleY, transform.up);
-            var slopeRot = Quaternion.Slerp(lockYRot, splineRotation, FitSlope);
-            rotation = slopeRot * Quaternion.Euler(rotOffset) * remapRotation;
+            if (FitSlope == 1)
+            {
+                rotation = splineRotation * Quaternion.Euler(rotOffset) * remapRotation;
+            }
+            else
+            {
+                var lockAngleY = Vector3.SignedAngle(transform.forward, tan, transform.up);
+                var lockYRot = Quaternion.AngleAxis(lockAngleY, transform.up);
+                var slopeRot = Quaternion.Slerp(lockYRot, splineRotation, FitSlope);
+                rotation = slopeRot * Quaternion.Euler(rotOffset) * remapRotation;
+            }
+
 
             // Scale
             var scaleOffset = Vector3.Lerp(ScaleOffset.Min, ScaleOffset.Max, Random.value);
