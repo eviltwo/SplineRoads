@@ -73,6 +73,9 @@ namespace SplineRoads
         public float FitRotationToTerrain = 0f;
 
         [SerializeField]
+        private bool _updateOnTerrainChange = false;
+
+        [SerializeField]
         public int CountLimit = 1000;
 
         [SerializeField]
@@ -92,18 +95,28 @@ namespace SplineRoads
                 RandomSeed = GetInstanceID();
             }
             Spline.Changed += OnSplineChanged;
+            TerrainCallbacks.heightmapChanged += OnHeightMapChanged;
             SetDirty();
         }
 
         private void OnDisable()
         {
             Spline.Changed -= OnSplineChanged;
+            TerrainCallbacks.heightmapChanged -= OnHeightMapChanged;
             ClearInstances();
         }
 
         private void OnSplineChanged(Spline spline, int knotIndex, SplineModification modificationType)
         {
             if (Container != null && Container.Splines.Count > 0 && Container.Splines[Span.Index] == spline)
+            {
+                SetDirty();
+            }
+        }
+
+        private void OnHeightMapChanged(Terrain terrain, RectInt heightRegion, bool synched)
+        {
+            if (synched && _updateOnTerrainChange && (FitHeightToTerrain > 0 || FitRotationToTerrain > 0))
             {
                 SetDirty();
             }
