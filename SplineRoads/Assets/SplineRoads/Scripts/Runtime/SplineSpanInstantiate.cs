@@ -73,6 +73,11 @@ namespace SplineRoads
 
         private bool _isDirty;
 
+        private void Reset()
+        {
+            Container = GetComponentInParent<SplineContainer>();
+        }
+
         private void OnEnable()
         {
             if (RandomSeed == 0)
