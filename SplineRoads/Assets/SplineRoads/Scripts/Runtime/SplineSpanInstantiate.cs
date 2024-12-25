@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.Splines;
 using Random = UnityEngine.Random;
 
@@ -62,8 +63,17 @@ namespace SplineRoads
         [SerializeField]
         public Vector3Range ScaleOffset = default;
 
+        [SerializeField, Range(0, 1), FormerlySerializedAs("FitSlope")]
+        public float FitRotationToSpline = 1f;
+
         [SerializeField, Range(0, 1)]
-        public float FitSlope = 1f;
+        public float FitHeightToTerrain = 0f;
+
+        [SerializeField, Range(0, 1)]
+        public float FitRotationToTerrain = 0f;
+
+        [SerializeField]
+        private bool _updateOnTerrainChange = false;
 
         [SerializeField]
         public int CountLimit = 1000;
@@ -85,18 +95,28 @@ namespace SplineRoads
                 RandomSeed = GetInstanceID();
             }
             Spline.Changed += OnSplineChanged;
+            TerrainCallbacks.heightmapChanged += OnHeightMapChanged;
             SetDirty();
         }
 
         private void OnDisable()
         {
             Spline.Changed -= OnSplineChanged;
+            TerrainCallbacks.heightmapChanged -= OnHeightMapChanged;
             ClearInstances();
         }
 
         private void OnSplineChanged(Spline spline, int knotIndex, SplineModification modificationType)
         {
             if (Container != null && Container.Splines.Count > 0 && Container.Splines[Span.Index] == spline)
+            {
+                SetDirty();
+            }
+        }
+
+        private void OnHeightMapChanged(Terrain terrain, RectInt heightRegion, bool synched)
+        {
+            if (synched && _updateOnTerrainChange && (FitHeightToTerrain > 0 || FitRotationToTerrain > 0))
             {
                 SetDirty();
             }
@@ -200,11 +220,17 @@ namespace SplineRoads
             position = pos;
             var posOffset = Vector3.Lerp(PositionOffset.Min, PositionOffset.Max, Random.value);
             position += splineRotation * posOffset;
+            if (FitHeightToTerrain > 0)
+            {
+                var terrain = Terrain.activeTerrain;
+                var terrainHeight = terrain.SampleHeight(position) + terrain.GetPosition().y;
+                position.y = Mathf.Lerp(pos.y, terrainHeight, FitHeightToTerrain);
+            }
 
             // Rotation
             var remapRotation = Quaternion.Inverse(Quaternion.LookRotation(ForwardAxis, UpAxis));
             var rotOffset = Vector3.Lerp(RotationOffset.Min, RotationOffset.Max, Random.value);
-            if (FitSlope == 1)
+            if (FitRotationToSpline == 1)
             {
                 rotation = splineRotation * Quaternion.Euler(rotOffset) * remapRotation;
             }
@@ -212,10 +238,17 @@ namespace SplineRoads
             {
                 var lockAngleY = Vector3.SignedAngle(transform.forward, tan, transform.up);
                 var lockYRot = Quaternion.AngleAxis(lockAngleY, transform.up);
-                var slopeRot = Quaternion.Slerp(lockYRot, splineRotation, FitSlope);
+                var slopeRot = Quaternion.Slerp(lockYRot, splineRotation, FitRotationToSpline);
                 rotation = slopeRot * Quaternion.Euler(rotOffset) * remapRotation;
             }
-
+            if (FitRotationToTerrain > 0)
+            {
+                var terrain = Terrain.activeTerrain;
+                var localPosition = terrain.transform.InverseTransformPoint(position);
+                var normal = terrain.terrainData.GetInterpolatedNormal(localPosition.x / terrain.terrainData.size.x, localPosition.z / terrain.terrainData.size.z);
+                var terrainRotation = Quaternion.Lerp(Quaternion.identity, Quaternion.FromToRotation(Vector3.up, normal), FitRotationToTerrain);
+                rotation = terrainRotation * rotation;
+            }
 
             // Scale
             var scaleOffset = Vector3.Lerp(ScaleOffset.Min, ScaleOffset.Max, Random.value);
