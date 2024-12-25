@@ -224,6 +224,7 @@ namespace SplineRoads
             {
                 var terrain = Terrain.activeTerrain;
                 var terrainHeight = terrain.SampleHeight(position) + terrain.GetPosition().y;
+                terrainHeight += posOffset.y;
                 position.y = Mathf.Lerp(pos.y, terrainHeight, FitHeightToTerrain);
             }
 
