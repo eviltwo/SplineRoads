@@ -40,6 +40,8 @@ namespace SplineRoads.Editor
             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SplineSpanInstantiate.ItemsToInstantiate)));
             DrawDirection("Up", serializedObject.FindProperty(nameof(SplineSpanInstantiate.UpAxis)));
             DrawDirection("Forward", serializedObject.FindProperty(nameof(SplineSpanInstantiate.ForwardAxis)));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SplineSpanInstantiate.InstantiateMethod)));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SplineSpanInstantiate.SpacingRange)));
             DrawVector3Range(serializedObject.FindProperty(nameof(SplineSpanInstantiate.PositionOffset)), ref _isRandomPositionOffset, ref IsFoldoutPositionOffset);
             DrawVector3Range(serializedObject.FindProperty(nameof(SplineSpanInstantiate.RotationOffset)), ref _isRandomRotationOffset, ref IsFoldoutRotationOffset);
             DrawVector3Range(serializedObject.FindProperty(nameof(SplineSpanInstantiate.ScaleOffset)), ref _isRandomScaleOffset, ref IsFoldoutScaleOffset);
