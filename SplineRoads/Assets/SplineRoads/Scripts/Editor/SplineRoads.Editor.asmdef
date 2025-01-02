@@ -1,0 +1,19 @@
+{
+    "name": "SplineRoads.Editor",
+    "rootNamespace": "SplineRoads.Editor",
+    "references": [
+        "GUID:21d1eb854b91ade49bc69a263d12bee2",
+        "GUID:6fb2abb77f4a21c468bce6a3d2d1fc6b"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

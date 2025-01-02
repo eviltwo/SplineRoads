@@ -258,7 +258,7 @@ MonoBehaviour:
   SpacingRange: {x: 2, y: 2}
   PositionOffset:
     Min: {x: 0, y: 0, z: 0}
-    Max: {x: -0.16, y: 0, z: 0}
+    Max: {x: 0, y: 0, z: 0}
   RotationOffset:
     Min: {x: 0, y: 0, z: 0}
     Max: {x: 0, y: 0, z: 0}
@@ -268,7 +268,6 @@ MonoBehaviour:
   FitRotationToSpline: 1
   FitHeightToTerrain: 1
   FitRotationToTerrain: 1
-  _updateOnTerrainChange: 1
   CountLimit: 1000
   RandomSeed: -22402
 --- !u!114 &879357618
