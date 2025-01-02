@@ -53,6 +53,7 @@ namespace SplineRoads.Editor
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SplineSpanInstantiate.FitRotationToTerrain)));
                 }
             }
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SplineSpanInstantiate.FitRotationToSpline)));
             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SplineSpanInstantiate.CountLimit)));
             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SplineSpanInstantiate.RandomSeed)));
 
