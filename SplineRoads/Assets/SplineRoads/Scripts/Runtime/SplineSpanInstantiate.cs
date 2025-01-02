@@ -27,7 +27,10 @@ namespace SplineRoads
         }
 
         [SerializeField]
-        public List<InstantiableItem> ItemsToInstantiate = new List<InstantiableItem>();
+        public List<InstantiableItem> ItemsToInstantiate = new List<InstantiableItem>
+        {
+            new InstantiableItem{ Prefab = null, Probability = 1f}
+        };
 
         [SerializeField]
         public Vector3 UpAxis = Vector3.up;
