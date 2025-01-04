@@ -94,6 +94,7 @@ namespace SplineRoads
             {
                 RandomSeed = GetInstanceID();
             }
+            Spline.Changed += OnSplineChanged;
             SetDirty();
         }
 
