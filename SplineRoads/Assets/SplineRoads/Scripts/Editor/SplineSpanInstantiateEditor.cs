@@ -7,6 +7,7 @@ namespace SplineRoads.Editor
     [CustomEditor(typeof(SplineSpanInstantiate))]
     public class SplineSpanInstantiateEditor : UnityEditor.Editor
     {
+        private bool _isRandomSpacing;
         private bool _isRandomPositionOffset;
         private static bool IsFoldoutPositionOffset;
         private bool _isRandomRotationOffset;
@@ -26,9 +27,10 @@ namespace SplineRoads.Editor
 
         protected virtual void OnEnable()
         {
-            _isRandomPositionOffset = IsRandomRange(serializedObject.FindProperty(nameof(SplineSpanInstantiate.PositionOffset)));
-            _isRandomRotationOffset = IsRandomRange(serializedObject.FindProperty(nameof(SplineSpanInstantiate.RotationOffset)));
-            _isRandomScaleOffset = IsRandomRange(serializedObject.FindProperty(nameof(SplineSpanInstantiate.ScaleOffset)));
+            _isRandomSpacing = IsRandomRangeFloat(serializedObject.FindProperty(nameof(SplineSpanInstantiate.SpacingRange)));
+            _isRandomPositionOffset = IsRandomRangeVector3(serializedObject.FindProperty(nameof(SplineSpanInstantiate.PositionOffset)));
+            _isRandomRotationOffset = IsRandomRangeVector3(serializedObject.FindProperty(nameof(SplineSpanInstantiate.RotationOffset)));
+            _isRandomScaleOffset = IsRandomRangeVector3(serializedObject.FindProperty(nameof(SplineSpanInstantiate.ScaleOffset)));
         }
 
         public override void OnInspectorGUI()
@@ -41,7 +43,7 @@ namespace SplineRoads.Editor
             DrawDirection("Up", serializedObject.FindProperty(nameof(SplineSpanInstantiate.UpAxis)));
             DrawDirection("Forward", serializedObject.FindProperty(nameof(SplineSpanInstantiate.ForwardAxis)));
             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SplineSpanInstantiate.InstantiateMethod)));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(SplineSpanInstantiate.SpacingRange)));
+            DrawFloatRange(serializedObject.FindProperty(nameof(SplineSpanInstantiate.SpacingRange)), ref _isRandomSpacing);
             DrawVector3Range(serializedObject.FindProperty(nameof(SplineSpanInstantiate.PositionOffset)), ref _isRandomPositionOffset, ref IsFoldoutPositionOffset);
             DrawVector3Range(serializedObject.FindProperty(nameof(SplineSpanInstantiate.RotationOffset)), ref _isRandomRotationOffset, ref IsFoldoutRotationOffset);
             DrawVector3Range(serializedObject.FindProperty(nameof(SplineSpanInstantiate.ScaleOffset)), ref _isRandomScaleOffset, ref IsFoldoutScaleOffset);
@@ -62,7 +64,13 @@ namespace SplineRoads.Editor
             serializedObject.ApplyModifiedProperties();
         }
 
-        private static bool IsRandomRange(SerializedProperty vector3RangeProperty)
+        private static bool IsRandomRangeFloat(SerializedProperty vector2Property)
+        {
+            var value = vector2Property.vector2Value;
+            return value.x != value.y;
+        }
+
+        private static bool IsRandomRangeVector3(SerializedProperty vector3RangeProperty)
         {
             var min = vector3RangeProperty.FindPropertyRelative(nameof(SplineSpanInstantiate.Vector3Range.Min)).vector3Value;
             var max = vector3RangeProperty.FindPropertyRelative(nameof(SplineSpanInstantiate.Vector3Range.Max)).vector3Value;
@@ -77,6 +85,33 @@ namespace SplineRoads.Editor
             if (directionIndex != directionIndexNew)
             {
                 directionProperty.vector3Value = DirectionNames[directionIndexNew].Item2;
+            }
+        }
+
+        private static void DrawFloatRange(SerializedProperty rangeProperty, ref bool isRandom)
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            using (var changeCheck = new EditorGUI.ChangeCheckScope())
+            {
+                var label = new GUIContent("Spacing");
+                var value = rangeProperty.vector2Value;
+                if (isRandom)
+                {
+                    value = EditorGUILayout.Vector2Field(label, value);
+                }
+                else
+                {
+                    value.x = EditorGUILayout.FloatField(label, value.x);
+                }
+                isRandom = GUILayout.Toggle(isRandom, "Ranmdom", GUI.skin.button, GUILayout.ExpandWidth(false));
+                if (changeCheck.changed)
+                {
+                    if (!isRandom)
+                    {
+                        value.y = value.x;
+                    }
+                    rangeProperty.vector2Value = value;
+                }
             }
         }
 
