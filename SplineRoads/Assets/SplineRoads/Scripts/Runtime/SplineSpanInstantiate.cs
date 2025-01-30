@@ -227,7 +227,7 @@ namespace SplineRoads
             }
             else
             {
-                var lockAngleY = Vector3.SignedAngle(transform.forward, tan, transform.up);
+                var lockAngleY = Vector3.SignedAngle(Vector3.forward, tan, transform.up);
                 var lockYRot = Quaternion.AngleAxis(lockAngleY, transform.up);
                 var slopeRot = Quaternion.Slerp(lockYRot, splineRotation, FitRotationToSpline);
                 rotation = slopeRot * Quaternion.Euler(rotOffset) * remapRotation;
